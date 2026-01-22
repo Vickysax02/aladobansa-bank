@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Aladobansa Bank</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    
+    <style>
+        /* TAB STYLES */
+        .tab-nav { display: flex; border-bottom: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .tab-btn {
+            flex: 1; padding: 12px; border: none; background: none;
+            font-weight: 600; color: var(--text-light); cursor: pointer;
+            border-bottom: 3px solid transparent; transition: 0.2s;
+        }
+        .tab-btn:hover { color: var(--primary); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ALERT MESSAGES */
+        .alert-box {
+            padding: 15px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; font-weight: 500;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .alert-error { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+        .alert-success { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-university fa-lg"></i>
+                <h2>Aladobansa</h2>
+            </div>
+            
+            <ul class="nav-links">
+                <li class="{{ 'active' if request.endpoint == 'dashboard' }}">
+                    <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'transactions' }}">
+                    <a href="/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'cards' }}">
+                    <a href="/cards"><i class="fas fa-credit-card"></i> Cards</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'analytics' }}">
+                    <a href="/analytics"><i class="fas fa-chart-pie"></i> Analytics</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'settings' }}">
+                    <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="top-header">
+                <div class="header-title">
+                    <h1>Welcome back, {{ user.name.split()[0] }} 👋</h1>
+                    <p>Here is your financial overview.</p>
+                </div>
+                <div class="header-actions">
+                    <div class="icon-btn"><i class="far fa-bell"></i><span class="dot"></span></div>
+                    
+                    <a href="/logout" class="user-profile" title="Logout">
+                        <div class="avatar">{{ user.name[0] }}</div>
+                    </a>
+                    
+                </div>
+            </header>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert-box alert-{{ category }}">
+                            <i class="fas fa-info-circle"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="dashboard-grid">
+
+                <div class="left-col">
+                    
+                    <div class="credit-card">
+                        <div class="card-top">
+                            <span class="card-chip"></span>
+                            <span class="card-contactless"><i class="fas fa-wifi"></i></span>
+                        </div>
+                        <div class="card-middle">
+                            <div class="card-balance-label">Current Balance</div>
+                            <div class="card-balance">₦{{ "{:,}".format(user.balance) }}</div>
+                        </div>
+                        <div class="card-bottom">
+                            <div class="card-info">
+                                <span class="label">Account Number</span>
+                                <span class="value">{{ user.account_no }}</span>
+                            </div>
+                            <div class="card-logo">VISA</div>
+                        </div>
+                        <div class="circle c1"></div>
+                        <div class="circle c2"></div>
+                    </div>
+
+                    <section class="quick-actions">
+                        <h3>Quick Actions</h3>
+                        <div class="actions-grid">
+                            <div class="action-item" onclick="switchTab('tab-deposit')">
+                                <div class="icon-box green"><i class="fas fa-plus"></i></div>
+                                <span>Add Money</span>
+                            </div>
+                            <div class="action-item" onclick="switchTab('tab-transfer')">
+                                <div class="icon-box orange"><i class="fas fa-arrow-up"></i></div>
+                                <span>Transfer</span>
+                            </div>
+                            <div class="action-item" onclick="switchTab('tab-bills')">
+                                <div class="icon-box purple"><i class="fas fa-bolt"></i></div>
+                                <span>Bills</span>
+                            </div>
+                            <div class="action-item" onclick="window.location.href='/transactions'">
+                                <div class="icon-box blue"><i class="fas fa-receipt"></i></div>
+                                <span>History</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="limit-section">
+                        <div class="limit-header">
+                            <span>Daily Limit ({{ user.tier }})</span>
+                            <span>{{ progress|int }}% Used</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-bar" style="width: {{ progress }}%;"></div>
+                        </div>
+                        <div class="limit-numbers">
+                            ₦{{ "{:,}".format(daily_used) }} / ₦{{ "{:,}".format(limit) }}
+                        </div>
+                    </section>
+                </div>
+
+                <div class="right-col">
+                    <div class="widget-card">
+                        
+                        <div class="tab-nav">
+                            <button class="tab-btn active" onclick="switchTab('tab-transfer')" id="btn-tab-transfer">Transfer</button>
+                            <button class="tab-btn" onclick="switchTab('tab-bills')" id="btn-tab-bills">Pay Bills</button>
+                            <button class="tab-btn" onclick="switchTab('tab-deposit')" id="btn-tab-deposit">Deposit</button>
+                        </div>
+
+                        <div id="tab-transfer" class="tab-content active">
+                            <div class="widget-header">
+                                <i class="fas fa-paper-plane"></i>
+                                <h3>Send Money</h3>
+                            </div>
+                            <form action="/transfer" method="POST">
+                                <div class="form-group">
+                                    <label>Recipient Account</label>
+                                    <input type="text" name="account_number" placeholder="Enter 10-digit number" required minlength="10" maxlength="10">
+                                </div>
+                                <div class="form-group">
+                                    <label>Amount</label>
+                                    <div class="input-wrapper">
+                                        <span>₦</span>
+                                        <input type="number" name="amount" placeholder="0.00" required min="1" step="0.01">
+                                    </div>
+                                </div>
+                                <button class="btn-primary">Transfer Funds</button>
+                            </form>
+                        </div>
+
+                        <div id="tab-bills" class="tab-content">
+                            <div class="widget-header">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                                <h3>Pay Bills</h3>
+                            </div>
+                            <form action="/pay_bills" method="POST">
+                                <div class="form-group">
+                                    <label>Bill Type</label>
+                                    <select name="bill_type" required style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc; outline:none;">
+                                        <option value="Airtime">Airtime Purchase</option>
+                                        <option value="Data">Data Bundle</option>
+                                        <option value="Electricity">Electricity (Prepaid)</option>
+                                        <option value="Cable">DSTV / GOTV</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Amount</label>
+                                    <div class="input-wrapper">
+                                        <span>₦</span>
+                                        <input type="number" name="amount" placeholder="0.00" required min="1" step="0.01">
+                                    </div>
+                                </div>
+                                <button class="btn-primary" style="background: var(--purple);">Pay Bill</button>
+                            </form>
+                        </div>
+
+                        <div id="tab-deposit" class="tab-content">
+                            <div class="widget-header">
+                                <i class="fas fa-wallet"></i>
+                                <h3>Manage Funds</h3>
+                            </div>
+                            
+                            <form action="/deposit" method="POST" style="margin-bottom: 20px;">
+                                <div class="form-group">
+                                    <label>Deposit Amount</label>
+                                    <div class="input-wrapper">
+                                        <span>₦</span>
+                                        <input type="number" name="amount" placeholder="Amount to Add" required min="1" step="0.01">
+                                    </div>
+                                    <button class="btn-soft-green" style="width:100%; margin-top:10px;">Deposit Money</button>
+                                </div>
+                            </form>
+
+                            <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+
+                            <form action="/withdraw" method="POST">
+                                <div class="form-group">
+                                    <label>Withdraw Amount</label>
+                                    <div class="input-wrapper">
+                                        <span>₦</span>
+                                        <input type="number" name="amount" placeholder="Amount to Withdraw" required min="1" step="0.01">
+                                    </div>
+                                    <button class="btn-soft-red" style="width:100%; margin-top:10px;">Withdraw Money</button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <section class="transactions-section">
+                <div class="section-header">
+                    <h3>Recent Transactions</h3>
+                    <a href="/transactions" class="view-all">View All</a>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Transaction</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Amount</th>
+                                <th>Receipt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in user.transactions[:5] %}
+                            <tr>
+                                <td>
+                                    <div class="txn-info">
+                                        <div class="txn-icon {{ 'debit' if t.type == 'Debit' else 'credit' }}">
+                                            <i class="fas {{ 'fa-arrow-up' if t.type == 'Debit' else 'fa-arrow-down' }}"></i>
+                                        </div>
+                                        <span>{{ t.desc }}</span>
+                                    </div>
+                                </td>
+                                <td class="text-muted">{{ t.date.split()[0] }}</td>
+                                <td><span class="status-pill success">Success</span></td>
+                                <td class="{{ 'text-red' if t.type == 'Debit' else 'text-green' }}">
+                                    {{ "-" if t.type == "Debit" else "+" }}₦{{ "{:,}".format(t.amount) }}
+                                </td>
+                                <td><a href="/receipt/{{ t.ref }}" target="_blank" class="btn-xs">View</a></td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">No transactions yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Deactivate all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab & activate button
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.add('active');
+        }
+    </script>
+
+</body>
+</html>

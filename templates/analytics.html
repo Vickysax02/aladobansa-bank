@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics | Aladobansa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header"><i class="fas fa-university fa-lg"></i><h2>Aladobansa</h2></div>
+            <ul class="nav-links">
+                <li class="{{ 'active' if request.endpoint == 'dashboard' }}">
+                    <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'transactions' }}">
+                    <a href="/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'cards' }}">
+                    <a href="/cards"><i class="fas fa-credit-card"></i> Cards</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'analytics' }}">
+                    <a href="/analytics"><i class="fas fa-chart-pie"></i> Analytics</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'settings' }}">
+                    <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
+                </li>
+            </ul>
+            <div class="sidebar-footer"><a href="/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a></div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-title"><h1>Analytics</h1></div>
+            </header>
+
+            <div class="dashboard-grid">
+                <div class="widget-card" style="border-top: 5px solid var(--green);">
+                    <div class="widget-header">
+                        <i class="fas fa-arrow-down" style="color: var(--green);"></i>
+                        <h3>Total Income</h3>
+                    </div>
+                    <h1 style="font-size: 32px; color: var(--green);">₦{{ "{:,}".format(total_in) }}</h1>
+                    <p style="font-size: 12px; color: #aaa;">Lifetime deposits</p>
+                </div>
+
+                <div class="widget-card" style="border-top: 5px solid var(--red);">
+                    <div class="widget-header">
+                        <i class="fas fa-arrow-up" style="color: var(--red);"></i>
+                        <h3>Total Spend</h3>
+                    </div>
+                    <h1 style="font-size: 32px; color: var(--red);">₦{{ "{:,}".format(total_out) }}</h1>
+                    <p style="font-size: 12px; color: #aaa;">Lifetime withdrawals/transfers</p>
+                </div>
+            </div>
+
+            <div class="widget-card">
+                <h3>Cash Flow Overview</h3>
+                <br>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span style="font-size: 12px;">In</span>
+                    <div style="flex: 1; height: 12px; background: #eee; border-radius: 6px;">
+                        <div style="width: 70%; height: 100%; background: var(--green); border-radius: 6px;"></div>
+                    </div>
+                </div>
+                <br>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span style="font-size: 12px;">Out</span>
+                    <div style="flex: 1; height: 12px; background: #eee; border-radius: 6px;">
+                        <div style="width: 40%; height: 100%; background: var(--red); border-radius: 6px;"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

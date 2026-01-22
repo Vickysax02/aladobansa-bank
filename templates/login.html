@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Internet Banking | Aladobansa Bank</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+
+    <style>
+        /* Extra styles for Login-specific elements */
+        .secure-badge {
+            background: #dcfce7;
+            color: #166534;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .input-with-icon input {
+            padding-left: 45px; /* Make room for the icon */
+        }
+
+        .options-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            margin-bottom: 20px;
+            color: #64748b;
+        }
+        
+        .options-row a { color: var(--primary); font-weight: 500; }
+    </style>
+</head>
+<body class="login-bg">
+
+    <div class="login-overlay">
+        <div class="login-card">
+            
+            <div class="secure-badge">
+                <i class="fas fa-lock"></i> Aladobansa Bank Login
+            </div>
+
+            <h1>Welcome Back</h1>
+            <p class="login-subtitle">Log in to your Online Banking</p>
+
+            <form method="post">
+                <div class="input-group input-with-icon">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="username" placeholder="Username" required autocomplete="username">
+                </div>
+
+                <div class="input-group input-with-icon">
+                    <i class="fas fa-key"></i>
+                    <input type="password" name="pin" placeholder="4-Digit PIN" required maxlength="4" autocomplete="current-password">
+                </div>
+
+                <div class="options-row">
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="checkbox" style="width: auto; margin: 0;"> Remember Me
+                    </label>
+                    <a href="#">Forgot PIN?</a>
+                </div>
+
+                <button type="submit" class="login-btn">Secure Login <i class="fas fa-arrow-right" style="margin-left: 5px;"></i></button>
+            </form>
+
+            {% if error %}
+                <p class="error"><i class="fas fa-exclamation-triangle"></i> {{ error }}</p>
+            {% endif %}
+
+            <div style="margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 20px;">
+                <p class="forgot" style="margin: 0;">
+                    New to Aladobansa? <a href="/register">Open an Account</a>
+                </p>
+            </div>
+            
+            <div style="margin-top: 20px; opacity: 0.5; font-size: 11px;">
+                <i class="fas fa-shield-alt"></i> 256-bit Encryption
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

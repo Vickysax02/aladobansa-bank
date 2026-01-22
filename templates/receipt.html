@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transaction Receipt | Aladobansa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* Specific Styles for the Receipt Page */
+        body {
+            background-color: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .receipt-container {
+            background: white;
+            width: 360px;
+            padding: 40px 30px;
+            border-radius: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Success Icon */
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            background: #dcfce7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+        }
+        .icon-circle i {
+            font-size: 36px;
+            color: #16a34a;
+        }
+
+        .success-text {
+            color: #1e3a8a;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .sub-text {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-bottom: 30px;
+        }
+
+        /* Ticket details */
+        .ticket-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 13px;
+            border-bottom: 1px dashed #e2e8f0;
+            padding-bottom: 15px;
+        }
+        .ticket-row:last-child {
+            border-bottom: none;
+        }
+        .label { color: #64748b; font-weight: 500; }
+        .value { color: #334155; font-weight: 600; text-align: right; }
+        .amount-big { font-size: 24px; color: #1e3a8a; font-weight: 800; margin: 10px 0 30px 0; }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        
+        .btn-dashboard {
+            background: #1e3a8a;
+            color: white;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            display: block;
+            transition: 0.2s;
+        }
+        .btn-dashboard:hover { background: #1e40af; transform: translateY(-2px); }
+
+        .btn-print {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+        }
+        .btn-print:hover { background: #e2e8f0; }
+
+        /* Jagged edge visual at top */
+        .receipt-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 8px;
+            background: #1e3a8a;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="receipt-container">
+        
+        <div class="icon-circle">
+            <i class="fas fa-check"></i>
+        </div>
+
+        <h2 class="success-text">Transfer Successful</h2>
+        <p class="sub-text">Your money is on its way!</p>
+
+        <div class="amount-big">₦{{ "{:,}".format(t.amount) }}</div>
+
+        <div class="ticket-info">
+            <div class="ticket-row">
+                <span class="label">Date</span>
+                <span class="value">{{ t.date }}</span>
+            </div>
+            <div class="ticket-row">
+                <span class="label">Reference</span>
+                <span class="value" style="font-family: monospace;">{{ t.ref }}</span>
+            </div>
+            <div class="ticket-row">
+                <span class="label">Description</span>
+                <span class="value">{{ t.desc }}</span>
+            </div>
+            <div class="ticket-row">
+                <span class="label">Status</span>
+                <span class="value" style="color: #16a34a;">Success</span>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <a href="/dashboard" class="btn-dashboard">Done & Back to Dashboard</a>
+            <button onclick="window.print()" class="btn-print"><i class="fas fa-download"></i> Download Receipt</button>
+        </div>
+
+    </div>
+
+</body>
+</html>

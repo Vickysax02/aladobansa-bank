@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | Aladobansa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header"><i class="fas fa-university fa-lg"></i><h2>Aladobansa</h2></div>
+            <ul class="nav-links">
+                <li class="{{ 'active' if request.endpoint == 'dashboard' }}">
+                    <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'transactions' }}">
+                    <a href="/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'cards' }}">
+                    <a href="/cards"><i class="fas fa-credit-card"></i> Cards</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'analytics' }}">
+                    <a href="/analytics"><i class="fas fa-chart-pie"></i> Analytics</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'settings' }}">
+                    <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
+                </li>
+            </ul>
+            <div class="sidebar-footer"><a href="/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a></div>
+        </aside>
+
+        <main class="main-content">
+            <div class="widget-card" style="max-width: 600px;">
+                <div class="widget-header">
+                    <i class="fas fa-user-circle"></i>
+                    <h3>Profile Settings</h3>
+                </div>
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" value="{{ user.name }}" readonly style="background: #f8fafc;">
+                </div>
+
+                <div class="form-group">
+                    <label>Account Tier</label>
+                    <input type="text" value="{{ user.tier }}" readonly style="background: #f8fafc;">
+                </div>
+
+                <div class="form-group">
+                    <label>Change PIN</label>
+                    <input type="password" placeholder="Enter new 4-digit PIN">
+                </div>
+
+                <button class="btn-primary">Save Changes</button>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

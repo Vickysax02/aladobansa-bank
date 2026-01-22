@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cards | Aladobansa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+
+    <style>
+        /* Animation for revealing numbers */
+        .reveal-text {
+            transition: all 0.3s ease;
+        }
+
+        /* Frozen Card Visual Effect */
+        .card-frozen {
+            filter: grayscale(100%) contrast(1.2);
+            opacity: 0.9;
+            position: relative;
+        }
+
+        .card-frozen::after {
+            content: "FROZEN";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-10deg);
+            font-size: 36px;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.9);
+            border: 4px solid rgba(255, 255, 255, 0.9);
+            padding: 10px 30px;
+            border-radius: 8px;
+            letter-spacing: 5px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* Clickable Cursor for Actions */
+        .clickable { cursor: pointer; user-select: none; }
+        .clickable:active { transform: scale(0.98); }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-header"><i class="fas fa-university fa-lg"></i><h2>Aladobansa</h2></div>
+            <ul class="nav-links">
+                <li class="{{ 'active' if request.endpoint == 'dashboard' }}">
+                    <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'transactions' }}">
+                    <a href="/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'cards' }}">
+                    <a href="/cards"><i class="fas fa-credit-card"></i> Cards</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'analytics' }}">
+                    <a href="/analytics"><i class="fas fa-chart-pie"></i> Analytics</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'settings' }}">
+                    <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
+                </li>
+            </ul>
+            <div class="sidebar-footer"><a href="/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a></div>
+        </aside>
+
+        <main class="main-content">
+            <div class="dashboard-grid">
+                
+                <div class="left-col">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2>My Cards</h2>
+                        <span id="card-status" class="status-pill success">Active</span>
+                    </div>
+                    <br>
+                    
+                    <div class="credit-card" id="virtual-card">
+                        <div class="card-top">
+                            <span class="card-chip"></span>
+                            <span class="card-contactless"><i class="fas fa-wifi"></i></span>
+                        </div>
+                        
+                        <div class="card-middle">
+                            <div class="card-balance-label" id="card-label">Virtual Card</div>
+                            
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div class="card-balance reveal-text" id="card-number" style="font-size: 22px; letter-spacing: 3px;">
+                                    **** **** **** {{ user.account_no[-4:] }}
+                                </div>
+                                <i class="fas fa-eye" id="toggle-icon" onclick="toggleDetails()" 
+                                   style="cursor: pointer; font-size: 18px; opacity: 0.7; transition: 0.2s;">
+                                </i>
+                            </div>
+                        </div>
+
+                        <div class="card-bottom">
+                            <div class="card-info">
+                                <span class="label">Holder Name</span>
+                                <span class="value" style="font-size: 14px;">{{ user.name.upper() }}</span>
+                            </div>
+                            
+                            <div style="display: flex; gap: 20px;">
+                                <div class="card-info">
+                                    <span class="label">Expires</span>
+                                    <span class="value" style="font-size: 14px;">12/28</span>
+                                </div>
+                                <div class="card-info" id="cvv-box" style="display: none;">
+                                    <span class="label">CVV</span>
+                                    <span class="value" style="font-size: 14px;">492</span>
+                                </div>
+                            </div>
+
+                            <div class="card-logo">VISA</div>
+                        </div>
+                        <div class="circle c1"></div>
+                        <div class="circle c2"></div>
+                    </div>
+                </div>
+
+                <div class="right-col">
+                    <div class="widget-card">
+                        <div class="widget-header">
+                            <i class="fas fa-sliders-h"></i>
+                            <h3>Card Settings</h3>
+                        </div>
+                        
+                        <div class="action-item clickable" onclick="toggleFreeze()" style="flex-direction: row; margin-bottom: 15px; justify-content: flex-start;">
+                            <div class="icon-box blue"><i class="fas fa-snowflake" id="freeze-icon"></i></div>
+                            <div>
+                                <span id="freeze-text" style="font-size: 14px; font-weight: 600;">Freeze Card</span>
+                                <p style="font-size: 12px; color: #aaa;">Temporarily disable operations</p>
+                            </div>
+                        </div>
+
+                        <div class="action-item clickable" onclick="togglePrivacy()" style="flex-direction: row; margin-bottom: 15px; justify-content: flex-start;">
+                            <div class="icon-box purple"><i class="fas fa-user-secret"></i></div>
+                            <div>
+                                <span style="font-size: 14px; font-weight: 600;">Privacy Mode</span>
+                                <p style="font-size: 12px; color: #aaa;">Hide card label on screen</p>
+                            </div>
+                        </div>
+
+                        <div class="action-item clickable" onclick="blockCard()" style="flex-direction: row; justify-content: flex-start;">
+                            <div class="icon-box orange"><i class="fas fa-ban"></i></div>
+                            <div>
+                                <span style="font-size: 14px; font-weight: 600; color: var(--red);">Block Card</span>
+                                <p style="font-size: 12px; color: #aaa;">Report stolen or lost</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // State Variables
+        let detailsVisible = false;
+        let isFrozen = false;
+        let isPrivate = false;
+
+        // 1. Toggle Card Details (Eye Icon)
+        function toggleDetails() {
+            const numEl = document.getElementById('card-number');
+            const iconEl = document.getElementById('toggle-icon');
+            const cvvEl = document.getElementById('cvv-box');
+            
+            // Construct a realistic PAN using the user's account tail
+            const tail = "{{ user.account_no[-4:] }}";
+            const fullNum = `5399 8220 1092 ${tail}`;
+            const maskedNum = `**** **** **** ${tail}`;
+
+            if (!detailsVisible) {
+                // Show Details
+                numEl.innerText = fullNum;
+                iconEl.classList.remove('fa-eye');
+                iconEl.classList.add('fa-eye-slash');
+                cvvEl.style.display = "block"; // Show CVV
+            } else {
+                // Hide Details
+                numEl.innerText = maskedNum;
+                iconEl.classList.remove('fa-eye-slash');
+                iconEl.classList.add('fa-eye');
+                cvvEl.style.display = "none"; // Hide CVV
+            }
+            detailsVisible = !detailsVisible;
+        }
+
+        // 2. Freeze/Unfreeze Card
+        function toggleFreeze() {
+            const card = document.getElementById('virtual-card');
+            const text = document.getElementById('freeze-text');
+            const icon = document.getElementById('freeze-icon');
+            const status = document.getElementById('card-status');
+
+            isFrozen = !isFrozen;
+
+            if (isFrozen) {
+                card.classList.add('card-frozen');
+                text.innerText = "Unfreeze Card";
+                text.style.color = "var(--red)";
+                status.innerText = "Frozen";
+                status.classList.remove('success');
+                status.style.background = "#fee2e2";
+                status.style.color = "#ef4444";
+            } else {
+                card.classList.remove('card-frozen');
+                text.innerText = "Freeze Card";
+                text.style.color = "var(--text)";
+                status.innerText = "Active";
+                status.classList.add('success');
+                status.style.background = "#f0fdf4";
+                status.style.color = "#10b981";
+            }
+        }
+
+        // 3. Privacy Mode (Hide Label)
+        function togglePrivacy() {
+            const label = document.getElementById('card-label');
+            isPrivate = !isPrivate;
+            if(isPrivate) {
+                label.innerText = "********";
+            } else {
+                label.innerText = "Virtual Card";
+            }
+        }
+
+        // 4. Block Card Alert
+        function blockCard() {
+            if(confirm("Are you sure you want to permanently block this card? This cannot be undone.")) {
+                alert("Card blocked successfully. Please contact support for a replacement.");
+            }
+        }
+    </script>
+</body>
+</html>

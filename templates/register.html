@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Open Account | Aladobansa Bank</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+
+    <style>
+        /* Extra styles for the "Real Bank" feel */
+        .secure-badge {
+            background: #e0f2fe;
+            color: #0284c7;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .terms-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            text-align: left;
+            font-size: 13px;
+            color: #64748b;
+            margin: 20px 0;
+        }
+        
+        .terms-box input {
+            margin-top: 3px;
+            width: auto; /* Override global input width */
+        }
+    </style>
+</head>
+<body class="login-bg">
+
+    <div class="login-overlay">
+        <div class="login-card">
+            
+            <div class="secure-badge">
+                <i class="fas fa-lock"></i> Aladobansa Bank Registration
+            </div>
+
+            <h1>Create Account</h1>
+            <p class="login-subtitle">Join 2+ million users at Aladobansa Bank</p>
+
+            <form method="post" action="/register">
+                <div class="input-group">
+                    <input type="text" name="name" placeholder="Legal Full Name" required autocomplete="name">
+                </div>
+                
+                <div class="input-group">
+                    <input type="text" name="username" placeholder="Choose a Username" required autocomplete="off">
+                </div>
+
+                <div class="input-group">
+                    <input type="password" name="pin" placeholder="Create 4-Digit PIN" required maxlength="4" pattern="\d{4}" title="PIN must be 4 digits">
+                </div>
+
+                <div class="terms-box">
+                    <input type="checkbox" required id="terms">
+                    <label for="terms">I agree to the <a href="#" style="color: var(--primary);">Terms of Service</a> and <a href="#" style="color: var(--primary);">Privacy Policy</a>.</label>
+                </div>
+
+                <button type="submit" class="login-btn">Get Started</button>
+            </form>
+
+            {% if error %}
+                <p class="error"><i class="fas fa-exclamation-circle"></i> {{ error }}</p>
+            {% endif %}
+
+            <p class="forgot">
+                Already have an account? <a href="/">Log in securely</a>
+            </p>
+            
+            <div style="margin-top: 30px; opacity: 0.6; font-size: 11px;">
+                <i class="fas fa-shield-alt"></i> Licensed by the Central Bank
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions | Aladobansa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-university fa-lg"></i><h2>Aladobansa</h2>
+            </div>
+            <ul class="nav-links">
+                <li class="{{ 'active' if request.endpoint == 'dashboard' }}">
+                    <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'transactions' }}">
+                    <a href="/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'cards' }}">
+                    <a href="/cards"><i class="fas fa-credit-card"></i> Cards</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'analytics' }}">
+                    <a href="/analytics"><i class="fas fa-chart-pie"></i> Analytics</a>
+                </li>
+                <li class="{{ 'active' if request.endpoint == 'settings' }}">
+                    <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
+                </li>
+            </ul>
+                    <a href="/logout" class="user-profile" title="Logout">
+                        <div class="avatar">{{ user.name[0] }}</div>
+                    </a>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-title">
+                    <h1>Transactions</h1>
+                    <p>Your financial activity log.</p>
+                </div>
+                <div class="user-profile"><div class="avatar">{{ user.name[0] }}</div></div>
+            </header>
+
+            <div class="transactions-section">
+                <div class="section-header">
+                    <div class="input-wrapper" style="width: 300px;">
+                        <span><i class="fas fa-search"></i></span>
+                        <input type="text" placeholder="Search by name or amount...">
+                    </div>
+                    <button class="btn-xs"><i class="fas fa-download"></i> Export CSV</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Reference</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in transactions %}
+                        <tr>
+                            <td>
+                                <div class="txn-info">
+                                    <div class="txn-icon {{ 'debit' if t.type == 'Debit' else 'credit' }}">
+                                        <i class="fas {{ 'fa-arrow-up' if t.type == 'Debit' else 'fa-arrow-down' }}"></i>
+                                    </div>
+                                    <span>{{ t.desc }}</span>
+                                </div>
+                            </td>
+                            <td class="text-muted">#{{ t.ref }}</td>
+                            <td class="text-muted">{{ t.date }}</td>
+                            <td><span class="status-pill success">Success</span></td>
+                            <td class="{{ 'text-red' if t.type == 'Debit' else 'text-green' }}">
+                                {{ "-" if t.type == "Debit" else "+" }}₦{{ "{:,}".format(t.amount) }}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="5" class="text-center">No transactions found</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
