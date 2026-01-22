@@ -11,9 +11,9 @@ DB_FILE = "banking_data.json"
 
 # --- CONFIGURATION: SPENDING LIMITS ---
 TIER_LIMITS = {
-    "Tier 1": 50000,    # Max daily transfer: 50k
-    "Tier 2": 200000,   # Max daily transfer: 200k
-    "Tier 3": 5000000   # Max daily transfer: 5m
+    "Tier 1": 9000000,    # Max daily transfer: 9m
+    "Tier 2": 9000000000,   # Max daily transfer: 9b
+    "Tier 3": 9000000000000   # Max daily transfer: 9t
 }
 
 # --- HELPER FUNCTIONS ---
@@ -47,7 +47,7 @@ def check_daily_limit(user, amount):
         user["last_txn_date"] = today_str
     
     tier = user.get("tier", "Tier 1")
-    limit = TIER_LIMITS.get(tier, 50000)
+    limit = TIER_LIMITS.get(tier, 9000000)
     
     if (user.get("daily_used", 0) + amount) > limit:
         return False, limit
@@ -113,7 +113,7 @@ def dashboard():
 
     # Calculate Limits for Progress Bar
     tier = user.get("tier", "Tier 1")
-    limit = TIER_LIMITS.get(tier, 50000)
+    limit = TIER_LIMITS.get(tier, 9000000)
     daily_used = user.get("daily_used", 0)
     
     # Visual reset if date changed (without saving yet)
@@ -209,10 +209,10 @@ def upgrade_tier():
     
     if current_tier == "Tier 1":
         user["tier"] = "Tier 2"
-        flash("🎉 Upgraded to Tier 2! Daily Limit: ₦200,000", "success")
+        flash("🎉 Upgraded to Tier 2! Daily Limit: ₦9,000,000,000", "success")
     elif current_tier == "Tier 2":
         user["tier"] = "Tier 3"
-        flash("🚀 Upgraded to Tier 3! Daily Limit: ₦5,000,000", "success")
+        flash("🚀 Upgraded to Tier 3! Daily Limit: ₦9,000,000,000,000", "success")
     else:
         flash("You are already on the highest tier (Tier 3).", "info")
         
