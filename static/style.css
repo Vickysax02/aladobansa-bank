@@ -261,6 +261,11 @@ tr:last-child td { border-bottom: none; }
     .app-container {
         flex-direction: column;
         display: block; /* Remove flex locking */
+        
+        /* 👇 ADDED THIS TO FIX SCROLLING 👇 */
+        height: auto; 
+        overflow: visible;
+        /* 👆 END ADDITION 👆 */
     }
 
     /* 2. Transform Sidebar to Bottom Nav */
@@ -276,6 +281,7 @@ tr:last-child td { border-bottom: none; }
         z-index: 1000;
         box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
         flex-direction: row; /* Horizontal Items */
+        background: white; /* Ensure visible background */
     }
 
     /* Hide Desktop Sidebar elements */
@@ -321,6 +327,11 @@ tr:last-child td { border-bottom: none; }
     /* 3. Adjust Main Content */
     .main-content {
         padding: 20px 20px 100px 20px; /* Extra bottom padding so Nav doesn't block content */
+        
+        /* 👇 ADDED THIS TO FIX SCROLLING 👇 */
+        overflow: visible;
+        height: auto;
+        /* 👆 END ADDITION 👆 */
     }
 
     /* 4. Resize Header */
