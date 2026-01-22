@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Aladobansa Bank</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -295,17 +295,24 @@
 
     <script>
         function switchTab(tabId) {
-            // Hide all tab contents
+            // 1. Hide all tab contents
             const contents = document.querySelectorAll('.tab-content');
             contents.forEach(content => content.classList.remove('active'));
 
-            // Deactivate all buttons
+            // 2. Deactivate all buttons
             const buttons = document.querySelectorAll('.tab-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
 
-            // Show selected tab & activate button
-            document.getElementById(tabId).classList.add('active');
+            // 3. Show selected tab & activate button
+            const activeContent = document.getElementById(tabId);
+            activeContent.classList.add('active');
             document.getElementById('btn-' + tabId).classList.add('active');
+
+            // 4. AUTO-SCROLL (The Fix)
+            // If on mobile (screen smaller than 768px), scroll to the form
+            if (window.innerWidth <= 768) {
+                activeContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
     </script>
 

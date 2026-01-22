@@ -106,6 +106,11 @@ def dashboard():
     customers = load_data()
     user = customers.get(session["user"])
     
+    # If user doesn't exist (server reset), clear session and logout
+    if not user:
+        session.clear()
+        return redirect("/")
+
     # Calculate Limits for Progress Bar
     tier = user.get("tier", "Tier 1")
     limit = TIER_LIMITS.get(tier, 50000)
@@ -126,6 +131,12 @@ def transactions():
     
     customers = load_data()
     user = customers.get(session["user"])
+    
+    # If user doesn't exist (server reset), clear session and logout
+    if not user:
+        session.clear()
+        return redirect("/")
+
     # Pass full transaction list
     return render_template("transactions.html", user=user, transactions=user.get("transactions", []))
 
@@ -136,6 +147,12 @@ def cards():
     
     customers = load_data()
     user = customers.get(session["user"])
+    
+    # If user doesn't exist (server reset), clear session and logout
+    if not user:
+        session.clear()
+        return redirect("/")
+
     return render_template("cards.html", user=user)
 
 # 4. ANALYTICS PAGE
@@ -145,6 +162,12 @@ def analytics():
     
     customers = load_data()
     user = customers.get(session["user"])
+    
+    # If user doesn't exist (server reset), clear session and logout
+    if not user:
+        session.clear()
+        return redirect("/")
+
     txns = user.get("transactions", [])
 
     # Calculate Totals
@@ -160,6 +183,12 @@ def settings():
     
     customers = load_data()
     user = customers.get(session["user"])
+    
+    # If user doesn't exist (server reset), clear session and logout
+    if not user:
+        session.clear()
+        return redirect("/")
+
     return render_template("settings.html", user=user)
 
 # --- ACTION ROUTES (Processing Money) ---
@@ -172,7 +201,11 @@ def deposit():
     except ValueError: return redirect("/dashboard")
 
     customers = load_data()
-    user = customers[session["user"]]
+    user = customers.get(session["user"])
+    
+    if not user:
+        session.clear()
+        return redirect("/")
 
     if amount > 0:
         user["balance"] += amount
@@ -197,7 +230,11 @@ def withdraw():
     except ValueError: return redirect("/dashboard")
 
     customers = load_data()
-    user = customers[session["user"]]
+    user = customers.get(session["user"])
+    
+    if not user:
+        session.clear()
+        return redirect("/")
 
     if amount > 0 and amount <= user["balance"]:
         user["balance"] -= amount
@@ -219,23 +256,25 @@ def transfer():
     if "user" not in session: return redirect("/")
     
     try:
-        amount = int(request.form["amount"])
+        amount = float(request.form["amount"])
         recipient_acc = request.form["account_number"].strip()
     except ValueError: return redirect("/dashboard")
 
     customers = load_data()
     sender_username = session["user"]
+    
+    # --- FIX START: Check if user still exists after server restart ---
     sender = customers.get(sender_username)
-
-    # Safety Check: Sender must exist
     if not sender:
-        session.clear()
+        session.clear() # Clear the old cookie
+        flash("Session expired or server reset. Please login again.", "error")
         return redirect("/")
+    # --- FIX END ---
 
     # 1. Check Daily Limit & Balance
     allowed, limit = check_daily_limit(sender, amount)
     if not allowed or sender["balance"] < amount:
-        # Ideally, flash an error message here
+        flash("Insufficient funds or daily limit exceeded!", "error") 
         return redirect("/dashboard") 
 
     # 2. Find Recipient
@@ -250,10 +289,12 @@ def transfer():
     
     # 3. Validation Checks
     if not recipient:
-        return redirect("/dashboard") # Recipient not found
+        flash("Recipient account not found!", "error") 
+        return redirect("/dashboard") 
     
     if recipient_username == sender_username:
-        return redirect("/dashboard") # Cannot transfer to self!
+        flash("You cannot transfer money to yourself!", "error") 
+        return redirect("/dashboard") 
 
     # 4. Execute Transfer
     ref = generate_ref()
@@ -281,20 +322,6 @@ def transfer():
         "status": "Success"
     })
 
-    # Example inside the transfer function:
-    if not recipient:
-        flash("Recipient account not found!", "error")  # <--- Add this
-        return redirect("/dashboard")
-    
-    if recipient_username == sender_username:
-        flash("You cannot transfer money to yourself!", "error") # <--- Add this
-        return redirect("/dashboard")
-
-    # ... inside the balance check ...
-    if not allowed or sender["balance"] < amount:
-        flash("Insufficient funds or daily limit exceeded!", "error") # <--- Add this
-        return redirect("/dashboard")
-
     save_data(customers)
     return redirect(f"/receipt/{ref}")
 
@@ -307,7 +334,11 @@ def pay_bills():
 def receipt(ref):
     if "user" not in session: return redirect("/")
     customers = load_data()
-    user = customers[session["user"]]
+    user = customers.get(session["user"])
+    
+    if not user:
+        session.clear()
+        return redirect("/")
     
     # Find the specific transaction
     txn = next((t for t in user["transactions"] if t["ref"] == ref), None)
