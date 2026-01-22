@@ -251,18 +251,29 @@ def deposit():
 @app.route("/withdraw", methods=["POST"])
 def withdraw():
     if "user" not in session: return redirect("/")
+    
     try:
-        amount = int(request.form["amount"])
-    except ValueError: return redirect("/dashboard")
+        # FIX 1: Use float instead of int to handle decimals (cents/kobo)
+        amount = float(request.form["amount"])
+    except ValueError:
+        flash("Invalid amount entered", "error")
+        return redirect("/dashboard")
 
     customers = load_data()
     user = customers.get(session["user"])
     
+    # Safety check for server reset
     if not user:
         session.clear()
         return redirect("/")
 
-    if amount > 0 and amount <= user["balance"]:
+    # FIX 2: Check for insufficient funds explicitly and show error
+    if amount > user["balance"]:
+        flash("Insufficient funds! You cannot withdraw more than you have.", "error")
+        return redirect("/dashboard")
+
+    # Execute Withdrawal
+    if amount > 0:
         user["balance"] -= amount
         txn = {
             "date": datetime.now().strftime('%d-%m-%Y %H:%M'),
@@ -274,6 +285,7 @@ def withdraw():
         }
         user["transactions"].insert(0, txn)
         save_data(customers)
+        flash(f"Withdrawal of ₦{amount:,.2f} successful!", "success")
 
     return redirect("/dashboard")
 
