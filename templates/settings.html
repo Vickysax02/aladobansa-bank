@@ -7,6 +7,38 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* Upgrade Card Styles */
+        .tier-card {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tier-info h4 { margin: 0; font-size: 18px; font-weight: 700; }
+        .tier-info p { margin: 5px 0 0; opacity: 0.9; font-size: 13px; }
+        
+        .btn-upgrade {
+            background: white;
+            color: #1e3a8a;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-upgrade:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
+        /* Alert Box */
+        .alert-box { padding: 15px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+        .alert-success { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+        .alert-info { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -36,7 +68,34 @@
             <div class="widget-card" style="max-width: 600px;">
                 <div class="widget-header">
                     <i class="fas fa-user-circle"></i>
-                    <h3>Profile Settings</h3>
+                    <h3>Account Settings</h3>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert-box alert-{{ category }}">
+                                <i class="fas fa-info-circle"></i> {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="tier-card">
+                    <div class="tier-info">
+                        <h4>Current: {{ user.tier }}</h4>
+                        <p>
+                            {% if user.tier == "Tier 1" %} Limit: ₦50,000 / day
+                            {% elif user.tier == "Tier 2" %} Limit: ₦200,000 / day
+                            {% else %} Limit: ₦5,000,000 / day (Max)
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% if user.tier != "Tier 3" %}
+                    <form action="/upgrade_tier" method="POST">
+                        <button class="btn-upgrade">Upgrade Tier</button>
+                    </form>
+                    {% endif %}
                 </div>
 
                 <div class="form-group">
@@ -45,13 +104,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Account Tier</label>
-                    <input type="text" value="{{ user.tier }}" readonly style="background: #f8fafc;">
+                    <label>Username</label>
+                    <input type="text" value="{{ session.user }}" readonly style="background: #f8fafc;">
                 </div>
 
                 <div class="form-group">
                     <label>Change PIN</label>
-                    <input type="password" placeholder="Enter new 4-digit PIN">
+                    <input type="password" placeholder="Enter new 4-digit PIN" style="border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px;">
                 </div>
 
                 <button class="btn-primary">Save Changes</button>

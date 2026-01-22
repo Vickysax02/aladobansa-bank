@@ -193,6 +193,34 @@ def settings():
 
 # --- ACTION ROUTES (Processing Money) ---
 
+# --- NEW: UPGRADE TIER LOGIC ---
+@app.route("/upgrade_tier", methods=["POST"])
+def upgrade_tier():
+    if "user" not in session: return redirect("/")
+    
+    customers = load_data()
+    user = customers.get(session["user"])
+    
+    if not user:
+        session.clear()
+        return redirect("/")
+
+    current_tier = user.get("tier", "Tier 1")
+    
+    if current_tier == "Tier 1":
+        # Logic: You could add requirements here (e.g., must have > 50k balance)
+        user["tier"] = "Tier 2"
+        flash("🎉 Upgraded to Tier 2! Daily Limit: ₦200,000", "success")
+    elif current_tier == "Tier 2":
+        user["tier"] = "Tier 3"
+        flash("🚀 Upgraded to Tier 3! Daily Limit: ₦5,000,000", "success")
+    else:
+        flash("You are already on the highest tier (Tier 3).", "info")
+        
+    save_data(customers)
+    return redirect("/settings")
+# -------------------------------
+
 @app.route("/deposit", methods=["POST"])
 def deposit():
     if "user" not in session: return redirect("/")
