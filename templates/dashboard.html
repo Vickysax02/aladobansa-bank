@@ -170,8 +170,17 @@
                             <form action="/transfer" method="POST">
                                 <div class="form-group">
                                     <label>Recipient Account</label>
-                                    <input type="text" name="account_number" placeholder="Enter 10-digit number" required minlength="10" maxlength="10">
+                                    <div class="input-wrapper" style="border: 1px solid #e2e8f0; border-radius: 10px; padding: 0 14px; background: #f8fafc;">
+                                        <input type="text" name="account_number" 
+                                               placeholder="Enter 10-digit number" 
+                                               required minlength="10" maxlength="10"
+                                               oninput="checkAccount(this)" 
+                                               style="width: 100%; border: none; background: transparent; outline: none; padding: 12px 0;">
+                                        <i id="loading-icon" class="fas fa-circle-notch fa-spin" style="display: none; color: var(--primary);"></i>
+                                    </div>
+                                    <div id="recipient-name" style="height: 20px; font-size: 13px; margin-top: 5px; font-weight: 600; transition: 0.3s;"></div>
                                 </div>
+
                                 <div class="form-group">
                                     <label>Amount</label>
                                     <div class="input-wrapper">
@@ -190,14 +199,78 @@
                             </div>
                             <form action="/pay_bills" method="POST">
                                 <div class="form-group">
-                                    <label>Bill Type</label>
-                                    <select name="bill_type" required style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc; outline:none;">
+                                    <label>Bill Category</label>
+                                    <select id="bill_type" name="bill_type" onchange="updateBillFields()" required style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc; outline:none;">
                                         <option value="Airtime">Airtime Purchase</option>
                                         <option value="Data">Data Bundle</option>
                                         <option value="Electricity">Electricity (Prepaid)</option>
-                                        <option value="Cable">DSTV / GOTV</option>
+                                        <option value="Cable">Cable TV (DSTV/GOTV)</option>
+                                        <option value="Betting">Betting Wallet</option>
                                     </select>
                                 </div>
+
+                                <div id="fields-mobile" style="display: block;">
+                                    <div class="form-group">
+                                        <label>Network Provider</label>
+                                        <select name="network" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#fff;">
+                                            <option value="MTN">MTN</option>
+                                            <option value="GLO">Glo</option>
+                                            <option value="AIRTEL">Airtel</option>
+                                            <option value="9MOBILE">9mobile</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Phone Number</label>
+                                        <input type="text" name="phone_number" placeholder="08012345678" maxlength="11" style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px;">
+                                    </div>
+                                </div>
+
+                                <div id="fields-power" style="display: none;">
+                                    <div class="form-group">
+                                        <label>Disco Provider</label>
+                                        <select name="disco" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#fff;">
+                                            <option value="IKEDC">Ikeja Electric (IKEDC)</option>
+                                            <option value="EKEDC">Eko Electric (EKEDC)</option>
+                                            <option value="IBEDC">Ibadan Electric (IBEDC)</option>
+                                            <option value="AEDC">Abuja Electric (AEDC)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Meter Number</label>
+                                        <input type="text" name="meter_number" placeholder="Enter Meter Number" maxlength="13" style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px;">
+                                    </div>
+                                </div>
+
+                                <div id="fields-cable" style="display: none;">
+                                    <div class="form-group">
+                                        <label>Cable Provider</label>
+                                        <select name="cable_provider" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#fff;">
+                                            <option value="DSTV">DSTV</option>
+                                            <option value="GOTV">GOTV</option>
+                                            <option value="STARTIMES">StarTimes</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Smartcard / IUC Number</label>
+                                        <input type="text" name="smartcard" placeholder="Enter Card Number" maxlength="12" style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px;">
+                                    </div>
+                                </div>
+
+                                <div id="fields-betting" style="display: none;">
+                                    <div class="form-group">
+                                        <label>Betting Platform</label>
+                                        <select name="bet_platform" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px; background:#fff;">
+                                            <option value="BET9JA">Bet9ja</option>
+                                            <option value="SPORTY">SportyBet</option>
+                                            <option value="1XBET">1xBet</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>User ID</label>
+                                        <input type="text" name="bet_id" placeholder="Enter User ID" style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px;">
+                                    </div>
+                                </div>
+
                                 <div class="form-group">
                                     <label>Amount</label>
                                     <div class="input-wrapper">
@@ -308,13 +381,85 @@
             activeContent.classList.add('active');
             document.getElementById('btn-' + tabId).classList.add('active');
 
-            // 4. AUTO-SCROLL (The Fix)
-            // If on mobile (screen smaller than 768px), scroll to the form
+            // 4. AUTO-SCROLL
             if (window.innerWidth <= 768) {
                 activeContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
+
+        // NEW FUNCTION: CHECK ACCOUNT NAME
+        let timeout = null;
+
+        function checkAccount(input) {
+            const display = document.getElementById("recipient-name");
+            const loader = document.getElementById("loading-icon");
+            const accountNo = input.value;
+
+            // Reset display
+            display.innerHTML = "";
+            display.style.color = "#64748b";
+            
+            // Only check if length is 10 digits
+            if (accountNo.length === 10) {
+                loader.style.display = "block"; // Show spinner
+                
+                // Clear previous timer (to avoid spamming the server while typing)
+                clearTimeout(timeout);
+
+                // Wait 0.5 seconds after typing stops, then ask server
+                timeout = setTimeout(() => {
+                    fetch('/api/resolve_account', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({account_number: accountNo})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        loader.style.display = "none"; // Hide spinner
+                        
+                        if (data.status === "success") {
+                            display.innerHTML = "<i class='fas fa-check-circle'></i> " + data.account_name;
+                            display.style.color = "#16a34a"; // Green
+                        } else {
+                            display.innerHTML = "<i class='fas fa-times-circle'></i> Account not found";
+                            display.style.color = "#dc2626"; // Red
+                        }
+                    })
+                    .catch(err => {
+                        loader.style.display = "none";
+                    });
+                }, 500);
+            } else {
+                loader.style.display = "none";
+            }
+        }
+
+        // NEW FUNCTION: DYNAMIC BILL FIELDS
+        function updateBillFields() {
+            const type = document.getElementById('bill_type').value;
+            
+            // 1. Hide all sections first
+            document.getElementById('fields-mobile').style.display = 'none';
+            document.getElementById('fields-power').style.display = 'none';
+            document.getElementById('fields-cable').style.display = 'none';
+            document.getElementById('fields-betting').style.display = 'none';
+
+            // 2. Show the relevant section
+            if (type === 'Airtime' || type === 'Data') {
+                document.getElementById('fields-mobile').style.display = 'block';
+            } else if (type === 'Electricity') {
+                document.getElementById('fields-power').style.display = 'block';
+            } else if (type === 'Cable') {
+                document.getElementById('fields-cable').style.display = 'block';
+            } else if (type === 'Betting') {
+                document.getElementById('fields-betting').style.display = 'block';
+            }
+        }
     </script>
+    
+
+[Image of flow chart for payment processing]
+
 
 </body>
 </html>

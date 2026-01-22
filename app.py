@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, flash
+from flask import Flask, render_template, request, redirect, session, flash, jsonify
 from datetime import datetime
 import json
 import os
@@ -193,7 +193,7 @@ def settings():
 
 # --- ACTION ROUTES (Processing Money) ---
 
-# --- NEW: UPGRADE TIER LOGIC ---
+# --- UPGRADE TIER LOGIC ---
 @app.route("/upgrade_tier", methods=["POST"])
 def upgrade_tier():
     if "user" not in session: return redirect("/")
@@ -208,7 +208,6 @@ def upgrade_tier():
     current_tier = user.get("tier", "Tier 1")
     
     if current_tier == "Tier 1":
-        # Logic: You could add requirements here (e.g., must have > 50k balance)
         user["tier"] = "Tier 2"
         flash("🎉 Upgraded to Tier 2! Daily Limit: ₦200,000", "success")
     elif current_tier == "Tier 2":
@@ -219,7 +218,6 @@ def upgrade_tier():
         
     save_data(customers)
     return redirect("/settings")
-# -------------------------------
 
 @app.route("/deposit", methods=["POST"])
 def deposit():
@@ -291,13 +289,11 @@ def transfer():
     customers = load_data()
     sender_username = session["user"]
     
-    # --- FIX START: Check if user still exists after server restart ---
     sender = customers.get(sender_username)
     if not sender:
-        session.clear() # Clear the old cookie
+        session.clear()
         flash("Session expired or server reset. Please login again.", "error")
         return redirect("/")
-    # --- FIX END ---
 
     # 1. Check Daily Limit & Balance
     allowed, limit = check_daily_limit(sender, amount)
@@ -353,10 +349,71 @@ def transfer():
     save_data(customers)
     return redirect(f"/receipt/{ref}")
 
+# --- UPDATED PAY BILLS FUNCTION ---
 @app.route("/pay_bills", methods=["POST"])
 def pay_bills():
-    # You can hook this up to the dashboard form later
-    return redirect("/dashboard")
+    if "user" not in session: return redirect("/")
+    
+    customers = load_data()
+    user = customers.get(session["user"])
+    
+    if not user:
+        session.clear()
+        return redirect("/")
+
+    try:
+        amount = float(request.form["amount"])
+        bill_type = request.form["bill_type"]
+    except ValueError:
+        flash("Invalid amount entered", "error")
+        return redirect("/dashboard")
+
+    # Check Balance
+    if user["balance"] < amount:
+        flash("Insufficient funds for bill payment!", "error")
+        return redirect("/dashboard")
+
+    # Generate Description based on inputs
+    desc = f"Bill: {bill_type}"
+    
+    if bill_type in ["Airtime", "Data"]:
+        network = request.form.get("network", "Mobile")
+        phone = request.form.get("phone_number", "")
+        desc = f"{bill_type}: {network} {phone}"
+        
+    elif bill_type == "Electricity":
+        disco = request.form.get("disco", "Power")
+        meter = request.form.get("meter_number", "")
+        desc = f"Power: {disco} ({meter})"
+        
+    elif bill_type == "Cable":
+        provider = request.form.get("cable_provider", "Cable")
+        iuc = request.form.get("smartcard", "")
+        desc = f"Cable: {provider} ({iuc})"
+
+    elif bill_type == "Betting":
+        platform = request.form.get("bet_platform", "Bet")
+        userid = request.form.get("bet_id", "")
+        desc = f"Betting: {platform} ({userid})"
+
+    # Execute Transaction
+    user["balance"] -= amount
+    ref = generate_ref()
+    
+    txn = {
+        "date": datetime.now().strftime('%d-%m-%Y %H:%M'),
+        "desc": desc,
+        "type": "Debit", 
+        "amount": amount, 
+        "ref": ref, 
+        "status": "Success"
+    }
+    
+    user["transactions"].insert(0, txn)
+    save_data(customers)
+    
+    return redirect(f"/receipt/{ref}")
+# ----------------------------------
 
 @app.route("/receipt/<ref>")
 def receipt(ref):
@@ -373,6 +430,26 @@ def receipt(ref):
     if not txn: return redirect("/dashboard")
     
     return render_template("receipt.html", t=txn, user=user)
+
+# --- API TO CHECK ACCOUNT NAMES ---
+@app.route("/api/resolve_account", methods=["POST"])
+def resolve_account():
+    data = request.get_json()
+    account_no = data.get("account_number", "").strip()
+    
+    customers = load_data()
+    
+    # Search for the account owner
+    found_name = None
+    for user_data in customers.values():
+        if user_data.get("account_no") == account_no:
+            found_name = user_data["name"]
+            break
+            
+    if found_name:
+        return jsonify({"status": "success", "account_name": found_name})
+    else:
+        return jsonify({"status": "error", "message": "Account not found"})
 
 @app.route("/logout")
 def logout():
