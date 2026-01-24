@@ -11,7 +11,7 @@ DB_FILE = "banking_data.json"
 
 # --- CONFIGURATION: SPENDING LIMITS ---
 TIER_LIMITS = {
-    "Tier 1": 9000000,          # 9 Million
+    "Tier 1": 900000,          # 9 Hundred Thousand
     "Tier 2": 9000000000,       # 9 Billion
     "Tier 3": 9000000000000     # 9 Trillion
 }
@@ -47,7 +47,7 @@ def check_daily_limit(user, amount):
         user["last_txn_date"] = today_str
     
     tier = user.get("tier", "Tier 1")
-    limit = TIER_LIMITS.get(tier, 9000000)
+    limit = TIER_LIMITS.get(tier, 900000)
     
     if (user.get("daily_used", 0) + amount) > limit:
         return False, limit
@@ -111,7 +111,7 @@ def dashboard():
 
     # Calculate Limits
     tier = user.get("tier", "Tier 1")
-    limit = TIER_LIMITS.get(tier, 9000000)
+    limit = TIER_LIMITS.get(tier, 900000)
     daily_used = user.get("daily_used", 0)
     
     if user.get("last_txn_date") != datetime.now().strftime("%Y-%m-%d"):
@@ -173,7 +173,7 @@ def upgrade_tier():
     
     if current_tier == "Tier 1":
         user["tier"] = "Tier 2"
-        flash("🎉 Upgraded to Tier 2! Daily Limit: ₦9,000,000,000", "success")
+        flash("🎉 Upgraded to Tier 2! Daily Limit: ₦9,000,000", "success")
     elif current_tier == "Tier 2":
         user["tier"] = "Tier 3"
         flash("🚀 Upgraded to Tier 3! Daily Limit: ₦9,000,000,000,000", "success")
