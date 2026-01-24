@@ -11,7 +11,10 @@
 <body>
     <div class="app-container">
         <aside class="sidebar">
-            <div class="sidebar-header"><i class="fas fa-university fa-lg"></i><h2>Aladobansa</h2></div>
+            <div class="sidebar-header">
+                <i class="fas fa-university fa-lg"></i>
+                <h2>Aladobansa</h2>
+            </div>
             <ul class="nav-links">
                 <li class="{{ 'active' if request.endpoint == 'dashboard' }}">
                     <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
@@ -29,51 +32,69 @@
                     <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
                 </li>
             </ul>
-            <div class="sidebar-footer"><a href="/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a></div>
+            <div class="sidebar-footer">
+                <a href="/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
         </aside>
 
         <main class="main-content">
             <header class="top-header">
-                <div class="header-title"><h1>Analytics</h1></div>
+                <div class="header-title">
+                    <h1>Analytics</h1>
+                    <p>Overview of your cash flow.</p>
+                </div>
+                <div class="user-profile">
+                    <div class="avatar">{{ user.name[0] }}</div>
+                </div>
             </header>
 
             <div class="dashboard-grid">
-                <div class="widget-card" style="border-top: 5px solid var(--green);">
+                
+                <div class="widget-card" style="border-top: 4px solid var(--green);">
                     <div class="widget-header">
-                        <i class="fas fa-arrow-down" style="color: var(--green);"></i>
-                        <h3>Total Income</h3>
+                        <div class="icon-box green"><i class="fas fa-arrow-down"></i></div>
+                        <h3 style="color: #64748b;">Total Income</h3>
                     </div>
-                    <h1 style="font-size: 32px; color: var(--green);">₦{{ "{:,}".format(total_in) }}</h1>
-                    <p style="font-size: 12px; color: #aaa;">Lifetime deposits</p>
+                    <h1 style="color: var(--green); font-size: 32px; margin: 10px 0;">₦{{ "{:,}".format(total_in) }}</h1>
+                    <p style="font-size: 12px; color: #94a3b8;">Lifetime deposits & credits</p>
                 </div>
 
-                <div class="widget-card" style="border-top: 5px solid var(--red);">
+                <div class="widget-card" style="border-top: 4px solid var(--red);">
                     <div class="widget-header">
-                        <i class="fas fa-arrow-up" style="color: var(--red);"></i>
-                        <h3>Total Spend</h3>
+                        <div class="icon-box orange"><i class="fas fa-arrow-up"></i></div>
+                        <h3 style="color: #64748b;">Total Spend</h3>
                     </div>
-                    <h1 style="font-size: 32px; color: var(--red);">₦{{ "{:,}".format(total_out) }}</h1>
-                    <p style="font-size: 12px; color: #aaa;">Lifetime withdrawals/transfers</p>
+                    <h1 style="color: var(--red); font-size: 32px; margin: 10px 0;">₦{{ "{:,}".format(total_out) }}</h1>
+                    <p style="font-size: 12px; color: #94a3b8;">Lifetime withdrawals & transfers</p>
+                </div>
+
+            </div>
+
+            <div class="widget-card" style="margin-top: 30px;">
+                <div class="widget-header">
+                    <i class="fas fa-chart-bar"></i>
+                    <h3>Cash Flow Ratio</h3>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <span style="font-size: 13px; font-weight: 600; width: 40px;">In</span>
+                        <div style="flex: 1; height: 12px; background: #f1f5f9; border-radius: 6px; overflow: hidden;">
+                            <div style="width: 75%; height: 100%; background: var(--green); border-radius: 6px;"></div>
+                        </div>
+                        <span style="font-size: 12px; color: #64748b;">75%</span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="font-size: 13px; font-weight: 600; width: 40px;">Out</span>
+                        <div style="flex: 1; height: 12px; background: #f1f5f9; border-radius: 6px; overflow: hidden;">
+                            <div style="width: 45%; height: 100%; background: var(--red); border-radius: 6px;"></div>
+                        </div>
+                        <span style="font-size: 12px; color: #64748b;">45%</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="widget-card">
-                <h3>Cash Flow Overview</h3>
-                <br>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <span style="font-size: 12px;">In</span>
-                    <div style="flex: 1; height: 12px; background: #eee; border-radius: 6px;">
-                        <div style="width: 70%; height: 100%; background: var(--green); border-radius: 6px;"></div>
-                    </div>
-                </div>
-                <br>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <span style="font-size: 12px;">Out</span>
-                    <div style="flex: 1; height: 12px; background: #eee; border-radius: 6px;">
-                        <div style="width: 40%; height: 100%; background: var(--red); border-radius: 6px;"></div>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
 </body>

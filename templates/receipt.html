@@ -14,6 +14,8 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
         }
 
         .receipt-container {
@@ -48,12 +50,14 @@
             font-size: 20px;
             font-weight: 700;
             margin-bottom: 5px;
+            margin-top: 0;
         }
 
         .sub-text {
             color: #94a3b8;
             font-size: 13px;
             margin-bottom: 30px;
+            margin-top: 0;
         }
 
         /* Ticket details */
@@ -70,7 +74,7 @@
         }
         .label { color: #64748b; font-weight: 500; }
         .value { color: #334155; font-weight: 600; text-align: right; }
-        .amount-big { font-size: 24px; color: #1e3a8a; font-weight: 800; margin: 10px 0 30px 0; }
+        .amount-big { font-size: 32px; color: #1e3a8a; font-weight: 800; margin: 10px 0 30px 0; }
 
         /* Buttons */
         .btn-group {
@@ -89,6 +93,8 @@
             text-decoration: none;
             display: block;
             transition: 0.2s;
+            border: none;
+            cursor: pointer;
         }
         .btn-dashboard:hover { background: #1e40af; transform: translateY(-2px); }
 
@@ -102,6 +108,7 @@
             cursor: pointer;
             display: block;
             width: 100%;
+            transition: 0.2s;
         }
         .btn-print:hover { background: #e2e8f0; }
 
@@ -139,7 +146,7 @@
             </div>
             <div class="ticket-row">
                 <span class="label">Description</span>
-                <span class="value">{{ t.desc }}</span>
+                <span class="value" style="max-width: 180px;">{{ t.desc }}</span>
             </div>
             <div class="ticket-row">
                 <span class="label">Status</span>

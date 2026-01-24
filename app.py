@@ -11,9 +11,9 @@ DB_FILE = "banking_data.json"
 
 # --- CONFIGURATION: SPENDING LIMITS ---
 TIER_LIMITS = {
-    "Tier 1": 9000000,    # Max daily transfer: 9m
-    "Tier 2": 9000000000,   # Max daily transfer: 9b
-    "Tier 3": 9000000000000   # Max daily transfer: 9t
+    "Tier 1": 9000000,          # 9 Million
+    "Tier 2": 9000000000,       # 9 Billion
+    "Tier 3": 9000000000000     # 9 Trillion
 }
 
 # --- HELPER FUNCTIONS ---
@@ -54,7 +54,7 @@ def check_daily_limit(user, amount):
     
     return True, limit
 
-# --- PAGE ROUTES (LINKING THE HTML FILES) ---
+# --- PAGE ROUTES ---
 
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -98,7 +98,6 @@ def register():
         return redirect("/")
     return render_template("register.html")
 
-# 1. DASHBOARD PAGE
 @app.route("/dashboard")
 def dashboard():
     if "user" not in session: return redirect("/")
@@ -106,17 +105,15 @@ def dashboard():
     customers = load_data()
     user = customers.get(session["user"])
     
-    # If user doesn't exist (server reset), clear session and logout
     if not user:
         session.clear()
         return redirect("/")
 
-    # Calculate Limits for Progress Bar
+    # Calculate Limits
     tier = user.get("tier", "Tier 1")
     limit = TIER_LIMITS.get(tier, 9000000)
     daily_used = user.get("daily_used", 0)
     
-    # Visual reset if date changed (without saving yet)
     if user.get("last_txn_date") != datetime.now().strftime("%Y-%m-%d"):
         daily_used = 0
 
@@ -124,76 +121,45 @@ def dashboard():
 
     return render_template("dashboard.html", user=user, limit=limit, daily_used=daily_used, progress=progress)
 
-# 2. TRANSACTIONS PAGE
 @app.route("/transactions")
 def transactions():
     if "user" not in session: return redirect("/")
-    
     customers = load_data()
     user = customers.get(session["user"])
-    
-    # If user doesn't exist (server reset), clear session and logout
-    if not user:
-        session.clear()
-        return redirect("/")
-
-    # Pass full transaction list
+    if not user: return redirect("/")
     return render_template("transactions.html", user=user, transactions=user.get("transactions", []))
 
-# 3. CARDS PAGE
 @app.route("/cards")
 def cards():
     if "user" not in session: return redirect("/")
-    
     customers = load_data()
     user = customers.get(session["user"])
-    
-    # If user doesn't exist (server reset), clear session and logout
-    if not user:
-        session.clear()
-        return redirect("/")
-
+    if not user: return redirect("/")
     return render_template("cards.html", user=user)
 
-# 4. ANALYTICS PAGE
 @app.route("/analytics")
 def analytics():
     if "user" not in session: return redirect("/")
-    
     customers = load_data()
     user = customers.get(session["user"])
-    
-    # If user doesn't exist (server reset), clear session and logout
-    if not user:
-        session.clear()
-        return redirect("/")
+    if not user: return redirect("/")
 
     txns = user.get("transactions", [])
-
-    # Calculate Totals
     total_in = sum(t["amount"] for t in txns if t["type"] == "Credit")
     total_out = sum(t["amount"] for t in txns if t["type"] == "Debit")
 
     return render_template("analytics.html", user=user, total_in=total_in, total_out=total_out)
 
-# 5. SETTINGS PAGE
 @app.route("/settings")
 def settings():
     if "user" not in session: return redirect("/")
-    
     customers = load_data()
     user = customers.get(session["user"])
-    
-    # If user doesn't exist (server reset), clear session and logout
-    if not user:
-        session.clear()
-        return redirect("/")
-
+    if not user: return redirect("/")
     return render_template("settings.html", user=user)
 
-# --- ACTION ROUTES (Processing Money) ---
+# --- ACTION ROUTES ---
 
-# --- UPGRADE TIER LOGIC ---
 @app.route("/upgrade_tier", methods=["POST"])
 def upgrade_tier():
     if "user" not in session: return redirect("/")
@@ -201,9 +167,7 @@ def upgrade_tier():
     customers = load_data()
     user = customers.get(session["user"])
     
-    if not user:
-        session.clear()
-        return redirect("/")
+    if not user: return redirect("/")
 
     current_tier = user.get("tier", "Tier 1")
     
@@ -229,9 +193,7 @@ def deposit():
     customers = load_data()
     user = customers.get(session["user"])
     
-    if not user:
-        session.clear()
-        return redirect("/")
+    if not user: return redirect("/")
 
     if amount > 0:
         user["balance"] += amount
@@ -253,7 +215,6 @@ def withdraw():
     if "user" not in session: return redirect("/")
     
     try:
-        # FIX 1: Use float instead of int to handle decimals (cents/kobo)
         amount = float(request.form["amount"])
     except ValueError:
         flash("Invalid amount entered", "error")
@@ -262,17 +223,12 @@ def withdraw():
     customers = load_data()
     user = customers.get(session["user"])
     
-    # Safety check for server reset
-    if not user:
-        session.clear()
-        return redirect("/")
+    if not user: return redirect("/")
 
-    # FIX 2: Check for insufficient funds explicitly and show error
     if amount > user["balance"]:
         flash("Insufficient funds! You cannot withdraw more than you have.", "error")
         return redirect("/dashboard")
 
-    # Execute Withdrawal
     if amount > 0:
         user["balance"] -= amount
         txn = {
@@ -300,20 +256,17 @@ def transfer():
 
     customers = load_data()
     sender_username = session["user"]
-    
     sender = customers.get(sender_username)
+    
     if not sender:
         session.clear()
-        flash("Session expired or server reset. Please login again.", "error")
         return redirect("/")
 
-    # 1. Check Daily Limit & Balance
     allowed, limit = check_daily_limit(sender, amount)
     if not allowed or sender["balance"] < amount:
         flash("Insufficient funds or daily limit exceeded!", "error") 
         return redirect("/dashboard") 
 
-    # 2. Find Recipient
     recipient = None
     recipient_username = None
     
@@ -323,7 +276,6 @@ def transfer():
             recipient_username = uname
             break
     
-    # 3. Validation Checks
     if not recipient:
         flash("Recipient account not found!", "error") 
         return redirect("/dashboard") 
@@ -332,13 +284,11 @@ def transfer():
         flash("You cannot transfer money to yourself!", "error") 
         return redirect("/dashboard") 
 
-    # 4. Execute Transfer
     ref = generate_ref()
     sender["balance"] -= amount
     sender["daily_used"] += amount
     recipient["balance"] += amount
 
-    # Log for Sender
     sender["transactions"].insert(0, {
         "date": datetime.now().strftime('%d-%m-%Y %H:%M'),
         "desc": f"Transfer to {recipient['name']}",
@@ -348,7 +298,6 @@ def transfer():
         "status": "Success"
     })
 
-    # Log for Recipient
     recipient["transactions"].insert(0, {
         "date": datetime.now().strftime('%d-%m-%Y %H:%M'),
         "desc": f"Received from {sender['name']}",
@@ -380,14 +329,13 @@ def pay_bills():
         flash("Invalid amount entered", "error")
         return redirect("/dashboard")
 
-    # Check Balance
     if user["balance"] < amount:
         flash("Insufficient funds for bill payment!", "error")
         return redirect("/dashboard")
 
-    # Generate Description based on inputs
     desc = f"Bill: {bill_type}"
     
+    # Capture Dynamic Fields based on Type
     if bill_type in ["Airtime", "Data"]:
         network = request.form.get("network", "Mobile")
         phone = request.form.get("phone_number", "")
@@ -408,7 +356,6 @@ def pay_bills():
         userid = request.form.get("bet_id", "")
         desc = f"Betting: {platform} ({userid})"
 
-    # Execute Transaction
     user["balance"] -= amount
     ref = generate_ref()
     
@@ -425,33 +372,25 @@ def pay_bills():
     save_data(customers)
     
     return redirect(f"/receipt/{ref}")
-# ----------------------------------
 
 @app.route("/receipt/<ref>")
 def receipt(ref):
     if "user" not in session: return redirect("/")
     customers = load_data()
     user = customers.get(session["user"])
+    if not user: return redirect("/")
     
-    if not user:
-        session.clear()
-        return redirect("/")
-    
-    # Find the specific transaction
     txn = next((t for t in user["transactions"] if t["ref"] == ref), None)
     if not txn: return redirect("/dashboard")
     
     return render_template("receipt.html", t=txn, user=user)
 
-# --- API TO CHECK ACCOUNT NAMES ---
 @app.route("/api/resolve_account", methods=["POST"])
 def resolve_account():
     data = request.get_json()
     account_no = data.get("account_number", "").strip()
-    
     customers = load_data()
     
-    # Search for the account owner
     found_name = None
     for user_data in customers.values():
         if user_data.get("account_no") == account_no:

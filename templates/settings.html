@@ -5,70 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings | Aladobansa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
     <style>
-        /* Upgrade Card Styles */
+        /* Specific Styles for Settings Page */
         .tier-card {
-            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
             color: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 10px 20px -5px rgba(30, 58, 138, 0.3);
         }
-        .tier-info h4 { margin: 0; font-size: 18px; font-weight: 700; }
+        .tier-info h4 { margin: 0; font-size: 20px; font-weight: 700; }
         .tier-info p { margin: 5px 0 0; opacity: 0.9; font-size: 13px; }
         
         .btn-upgrade {
             background: white;
             color: #1e3a8a;
             border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-weight: 600;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 700;
             cursor: pointer;
             transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .btn-upgrade:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .btn-upgrade:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.15); }
         
-        /* Alert Box */
-        .alert-box { padding: 15px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 10px; }
-        .alert-success { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
-        .alert-info { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+        .alert-box {
+            padding: 15px; border-radius: 12px; margin-bottom: 25px; font-size: 14px; font-weight: 500;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .alert-info { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }
     </style>
 </head>
 <body>
     <div class="app-container">
+        
         <aside class="sidebar">
-            <div class="sidebar-header"><i class="fas fa-university fa-lg"></i><h2>Aladobansa</h2></div>
+            <div class="sidebar-header">
+                <i class="fas fa-university fa-lg"></i>
+                <h2>Aladobansa</h2>
+            </div>
+            
             <ul class="nav-links">
-                <li class="{{ 'active' if request.endpoint == 'dashboard' }}">
-                    <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
-                </li>
-                <li class="{{ 'active' if request.endpoint == 'transactions' }}">
-                    <a href="/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
-                </li>
-                <li class="{{ 'active' if request.endpoint == 'cards' }}">
-                    <a href="/cards"><i class="fas fa-credit-card"></i> Cards</a>
-                </li>
-                <li class="{{ 'active' if request.endpoint == 'analytics' }}">
-                    <a href="/analytics"><i class="fas fa-chart-pie"></i> Analytics</a>
-                </li>
-                <li class="{{ 'active' if request.endpoint == 'settings' }}">
-                    <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
-                </li>
+                <li><a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a></li>
+                <li><a href="/cards"><i class="fas fa-credit-card"></i> Cards</a></li>
+                <li><a href="/analytics"><i class="fas fa-chart-pie"></i> Analytics</a></li>
+                <li class="active"><a href="/settings"><i class="fas fa-cog"></i> Settings</a></li>
             </ul>
-            <div class="sidebar-footer"><a href="/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a></div>
+
+            <div class="sidebar-footer">
+                <a href="/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
         </aside>
 
         <main class="main-content">
-            <div class="widget-card" style="max-width: 600px;">
+            
+            <header class="top-header">
+                <div class="header-title">
+                    <h1>Account Settings</h1>
+                    <p>Manage your profile and security preferences.</p>
+                </div>
+                <div class="header-actions">
+                    <a href="/logout" class="user-profile" title="Logout">
+                        <div class="avatar">{{ user.name[0] }}</div>
+                    </a>
+                </div>
+            </header>
+
+            <div class="widget-card" style="max-width: 700px;">
+                
                 <div class="widget-header">
-                    <i class="fas fa-user-circle"></i>
-                    <h3>Account Settings</h3>
+                    <i class="fas fa-user-shield"></i>
+                    <h3>Profile & Limits</h3>
                 </div>
 
                 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -83,38 +99,48 @@
 
                 <div class="tier-card">
                     <div class="tier-info">
-                        <h4>Current: {{ user.tier }}</h4>
+                        <h4>Current Plan: {{ user.tier }}</h4>
                         <p>
-                            {% if user.tier == "Tier 1" %} Limit: ₦9,000,000 / day
-                            {% elif user.tier == "Tier 2" %} Limit: ₦9,000,000,000 / day
-                            {% else %} Limit: ₦9,000,000,000,000 / day (Max)
+                            {% if user.tier == "Tier 1" %} Daily Limit: ₦9,000,000
+                            {% elif user.tier == "Tier 2" %} Daily Limit: ₦9,000,000,000
+                            {% else %} Daily Limit: ₦9,000,000,000,000 (Max)
                             {% endif %}
                         </p>
                     </div>
                     {% if user.tier != "Tier 3" %}
                     <form action="/upgrade_tier" method="POST">
-                        <button class="btn-upgrade">Upgrade Tier</button>
+                        <button class="btn-upgrade">Upgrade Now</button>
                     </form>
                     {% endif %}
                 </div>
 
                 <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" value="{{ user.name }}" readonly style="background: #f8fafc;">
+                    <label>Full Legal Name</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" value="{{ user.name }}" readonly style="background: #f8fafc; color: #64748b; cursor: not-allowed;">
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" value="{{ session.user }}" readonly style="background: #f8fafc;">
+                    <div class="input-wrapper">
+                        <i class="fas fa-at"></i>
+                        <input type="text" value="{{ session.user }}" readonly style="background: #f8fafc; color: #64748b; cursor: not-allowed;">
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Change PIN</label>
-                    <input type="password" placeholder="Enter new 4-digit PIN" style="border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px;">
+                    <label>Change Transaction PIN</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-key"></i>
+                        <input type="password" placeholder="Enter new 4-digit PIN" maxlength="4">
+                    </div>
                 </div>
 
                 <button class="btn-primary">Save Changes</button>
             </div>
+
         </main>
     </div>
 </body>

@@ -70,16 +70,19 @@
             
             <header class="top-header">
                 <div class="header-title">
-                    <h1>Welcome back, {{ user.name.split()[0] }} 👋</h1>
-                    <p>Here is your financial overview.</p>
+                    <h1>Hello, {{ user.name.split()[0] }}</h1>
+                    <p><i class="fas fa-shield-alt" style="color: var(--success);"></i> Secure Connection • Last login: {{ session.last_login }}</p>
                 </div>
                 <div class="header-actions">
                     <div class="icon-btn"><i class="far fa-bell"></i><span class="dot"></span></div>
                     
                     <a href="/logout" class="user-profile" title="Logout">
+                        <div style="text-align: right; margin-right: 10px; display: none; @media(min-width:768px){display:block;}">
+                            <span style="display: block; font-size: 12px; font-weight: 700;">{{ user.account_type }}</span>
+                            <span style="display: block; font-size: 10px; color: #94a3b8;">{{ user.tier }}</span>
+                        </div>
                         <div class="avatar">{{ user.name[0] }}</div>
                     </a>
-                    
                 </div>
             </header>
 
@@ -368,45 +371,33 @@
 
     <script>
         function switchTab(tabId) {
-            // 1. Hide all tab contents
             const contents = document.querySelectorAll('.tab-content');
             contents.forEach(content => content.classList.remove('active'));
 
-            // 2. Deactivate all buttons
             const buttons = document.querySelectorAll('.tab-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
 
-            // 3. Show selected tab & activate button
             const activeContent = document.getElementById(tabId);
             activeContent.classList.add('active');
             document.getElementById('btn-' + tabId).classList.add('active');
 
-            // 4. AUTO-SCROLL
             if (window.innerWidth <= 768) {
                 activeContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
-        // NEW FUNCTION: CHECK ACCOUNT NAME
         let timeout = null;
-
         function checkAccount(input) {
             const display = document.getElementById("recipient-name");
             const loader = document.getElementById("loading-icon");
             const accountNo = input.value;
 
-            // Reset display
             display.innerHTML = "";
             display.style.color = "#64748b";
             
-            // Only check if length is 10 digits
             if (accountNo.length === 10) {
-                loader.style.display = "block"; // Show spinner
-                
-                // Clear previous timer (to avoid spamming the server while typing)
+                loader.style.display = "block"; 
                 clearTimeout(timeout);
-
-                // Wait 0.5 seconds after typing stops, then ask server
                 timeout = setTimeout(() => {
                     fetch('/api/resolve_account', {
                         method: 'POST',
@@ -415,14 +406,13 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        loader.style.display = "none"; // Hide spinner
-                        
+                        loader.style.display = "none"; 
                         if (data.status === "success") {
                             display.innerHTML = "<i class='fas fa-check-circle'></i> " + data.account_name;
-                            display.style.color = "#16a34a"; // Green
+                            display.style.color = "#16a34a"; 
                         } else {
                             display.innerHTML = "<i class='fas fa-times-circle'></i> Account not found";
-                            display.style.color = "#dc2626"; // Red
+                            display.style.color = "#dc2626"; 
                         }
                     })
                     .catch(err => {
@@ -434,17 +424,13 @@
             }
         }
 
-        // NEW FUNCTION: DYNAMIC BILL FIELDS
         function updateBillFields() {
             const type = document.getElementById('bill_type').value;
-            
-            // 1. Hide all sections first
             document.getElementById('fields-mobile').style.display = 'none';
             document.getElementById('fields-power').style.display = 'none';
             document.getElementById('fields-cable').style.display = 'none';
             document.getElementById('fields-betting').style.display = 'none';
 
-            // 2. Show the relevant section
             if (type === 'Airtime' || type === 'Data') {
                 document.getElementById('fields-mobile').style.display = 'block';
             } else if (type === 'Electricity') {
@@ -456,7 +442,5 @@
             }
         }
     </script>
-    
-
 </body>
 </html>

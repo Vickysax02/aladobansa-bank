@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Internet Banking | Aladobansa Bank</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -37,7 +36,7 @@
         }
 
         .input-with-icon input {
-            padding-left: 45px; /* Make room for the icon */
+            padding-left: 45px !important; /* Force padding to make room for icon */
         }
 
         .options-row {
@@ -50,6 +49,18 @@
         }
         
         .options-row a { color: var(--primary); font-weight: 500; }
+        
+        .error {
+            color: #ef4444; 
+            background: #fee2e2; 
+            padding: 10px; 
+            border-radius: 8px; 
+            font-size: 13px; 
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
     </style>
 </head>
 <body class="login-bg">
@@ -61,10 +72,10 @@
                 <i class="fas fa-lock"></i> Aladobansa Bank Login
             </div>
 
-            <h1>Welcome Back</h1>
+            <h1 style="font-size: 24px; color: #0f172a; margin-bottom: 5px;">Welcome Back</h1>
             <p class="login-subtitle">Log in to your Online Banking</p>
 
-            <form method="post">
+            <form action="/" method="post">
                 <div class="input-group input-with-icon">
                     <i class="fas fa-user"></i>
                     <input type="text" name="username" placeholder="Username" required autocomplete="username">
@@ -86,7 +97,9 @@
             </form>
 
             {% if error %}
-                <p class="error"><i class="fas fa-exclamation-triangle"></i> {{ error }}</p>
+                <div class="error">
+                    <i class="fas fa-exclamation-triangle"></i> {{ error }}
+                </div>
             {% endif %}
 
             <div style="margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 20px;">
@@ -95,8 +108,8 @@
                 </p>
             </div>
             
-            <div style="margin-top: 20px; opacity: 0.5; font-size: 11px;">
-                <i class="fas fa-shield-alt"></i> 256-bit Encryption
+            <div style="margin-top: 20px; opacity: 0.5; font-size: 11px; color: #64748b;">
+                <i class="fas fa-shield-alt"></i> 256-bit Encryption • Licensed by CBN
             </div>
         </div>
     </div>

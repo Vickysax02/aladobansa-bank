@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transactions | Aladobansa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="app-container">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <i class="fas fa-university fa-lg"></i><h2>Aladobansa</h2>
+                <i class="fas fa-university fa-lg"></i>
+                <h2>Aladobansa</h2>
             </div>
             <ul class="nav-links">
                 <li class="{{ 'active' if request.endpoint == 'dashboard' }}">
@@ -31,9 +32,9 @@
                     <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
                 </li>
             </ul>
-                    <a href="/logout" class="user-profile" title="Logout">
-                        <div class="avatar">{{ user.name[0] }}</div>
-                    </a>
+            <div class="sidebar-footer">
+                <a href="/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
         </aside>
 
         <main class="main-content">
@@ -42,7 +43,11 @@
                     <h1>Transactions</h1>
                     <p>Your financial activity log.</p>
                 </div>
-                <div class="user-profile"><div class="avatar">{{ user.name[0] }}</div></div>
+                <div class="header-actions">
+                    <a href="/logout" class="user-profile" title="Logout">
+                        <div class="avatar">{{ user.name[0] }}</div>
+                    </a>
+                </div>
             </header>
 
             <div class="transactions-section">
@@ -54,39 +59,43 @@
                     <button class="btn-xs"><i class="fas fa-download"></i> Export CSV</button>
                 </div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Description</th>
-                            <th>Reference</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for t in transactions %}
-                        <tr>
-                            <td>
-                                <div class="txn-info">
-                                    <div class="txn-icon {{ 'debit' if t.type == 'Debit' else 'credit' }}">
-                                        <i class="fas {{ 'fa-arrow-up' if t.type == 'Debit' else 'fa-arrow-down' }}"></i>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Reference</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in transactions %}
+                            <tr>
+                                <td>
+                                    <div class="txn-info">
+                                        <div class="txn-icon {{ 'debit' if t.type == 'Debit' else 'credit' }}">
+                                            <i class="fas {{ 'fa-arrow-up' if t.type == 'Debit' else 'fa-arrow-down' }}"></i>
+                                        </div>
+                                        <span>{{ t.desc }}</span>
                                     </div>
-                                    <span>{{ t.desc }}</span>
-                                </div>
-                            </td>
-                            <td class="text-muted">#{{ t.ref }}</td>
-                            <td class="text-muted">{{ t.date }}</td>
-                            <td><span class="status-pill success">Success</span></td>
-                            <td class="{{ 'text-red' if t.type == 'Debit' else 'text-green' }}">
-                                {{ "-" if t.type == "Debit" else "+" }}₦{{ "{:,}".format(t.amount) }}
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr><td colspan="5" class="text-center">No transactions found</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                </td>
+                                <td class="text-muted">#{{ t.ref }}</td>
+                                <td class="text-muted">{{ t.date }}</td>
+                                <td><span class="status-pill success">Success</span></td>
+                                <td class="{{ 'text-red' if t.type == 'Debit' else 'text-green' }}">
+                                    {{ "-" if t.type == "Debit" else "+" }}₦{{ "{:,}".format(t.amount) }}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">No transactions found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>

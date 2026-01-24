@@ -38,6 +38,18 @@
             margin-top: 3px;
             width: auto; /* Override global input width */
         }
+
+        .error {
+            color: #ef4444; 
+            background: #fee2e2; 
+            padding: 10px; 
+            border-radius: 8px; 
+            font-size: 13px; 
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
     </style>
 </head>
 <body class="login-bg">
@@ -49,7 +61,7 @@
                 <i class="fas fa-lock"></i> Aladobansa Bank Registration
             </div>
 
-            <h1>Create Account</h1>
+            <h1 style="font-size: 24px; color: #0f172a; margin-bottom: 5px;">Create Account</h1>
             <p class="login-subtitle">Join 2+ million users at Aladobansa Bank</p>
 
             <form method="post" action="/register">
@@ -74,14 +86,18 @@
             </form>
 
             {% if error %}
-                <p class="error"><i class="fas fa-exclamation-circle"></i> {{ error }}</p>
+                <div class="error">
+                    <i class="fas fa-exclamation-circle"></i> {{ error }}
+                </div>
             {% endif %}
 
-            <p class="forgot">
-                Already have an account? <a href="/">Log in securely</a>
-            </p>
+            <div style="margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 20px;">
+                <p class="forgot" style="margin: 0;">
+                    Already have an account? <a href="/">Log in securely</a>
+                </p>
+            </div>
             
-            <div style="margin-top: 30px; opacity: 0.6; font-size: 11px;">
+            <div style="margin-top: 30px; opacity: 0.6; font-size: 11px; color: #64748b;">
                 <i class="fas fa-shield-alt"></i> Licensed by the Central Bank
             </div>
         </div>

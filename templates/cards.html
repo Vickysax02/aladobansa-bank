@@ -69,6 +69,11 @@
         </aside>
 
         <main class="main-content">
+            <header class="top-header">
+                <div class="header-title"><h1>My Cards</h1><p>Manage your physical and virtual cards.</p></div>
+                <div class="header-actions"><div class="avatar">{{ user.name[0] }}</div></div>
+            </header>
+
             <div class="dashboard-grid">
                 
                 <div class="left-col">
@@ -99,8 +104,8 @@
 
                         <div class="card-bottom">
                             <div class="card-info">
-                                <span class="label">Holder Name</span>
-                                <span class="value" style="font-size: 14px;">{{ user.name.upper() }}</span>
+                                <span class="label">Card Holder</span>
+                                <span class="value">{{ user.name.upper() }}</span>
                             </div>
                             
                             <div style="display: flex; gap: 20px;">
